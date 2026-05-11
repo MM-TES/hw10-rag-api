@@ -9,7 +9,7 @@ import structlog
 from fastapi import FastAPI
 from openai import AsyncOpenAI
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams
+from qdrant_client.models import Distance, PayloadSchemaType, VectorParams
 from sentence_transformers import SentenceTransformer
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
@@ -64,6 +64,16 @@ def _ensure_qdrant_collections(client: QdrantClient) -> None:
                 vectors_config=VectorParams(size=384, distance=Distance.COSINE),
             )
             log.info("qdrant_collection_created", name=name)
+    try:
+        client.create_payload_index(
+            collection_name=settings.QDRANT_CACHE_COLLECTION,
+            field_name="expire_at",
+            field_schema=PayloadSchemaType.INTEGER,
+        )
+        log.info("qdrant_cache_expire_at_index_created")
+    except Exception as e:
+        if "already exists" not in str(e).lower():
+            log.warning("qdrant_expire_at_index_failed", error=str(e))
 
 
 @asynccontextmanager

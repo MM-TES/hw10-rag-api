@@ -223,6 +223,15 @@ async def _llm_stream(
                 )
 
         if error_detail:
+            estimated = max(
+                100, sum(len(m.get("content", "")) for m in messages) // 4
+            )
+            try:
+                await check_and_consume(
+                    state.redis, key_data["api_key"], estimated, key_data["tokens_per_min"]
+                )
+            except Exception as e:
+                log.warning("consume_on_error_failed", error=str(e))
             yield sse({"type": "error", "error": error_detail})
             return
 
@@ -251,10 +260,13 @@ async def _llm_stream(
             except Exception as e:
                 log.warning("cache_store_failed", error=str(e))
 
+        consumed_tokens = usage.get("total_tokens", 0) or max(
+            1, (len(full_text) + sum(len(m.get("content", "")) for m in messages)) // 4
+        )
         allowed, retry_after = await check_and_consume(
             state.redis,
             key_data["api_key"],
-            usage.get("total_tokens", 0),
+            consumed_tokens,
             key_data["tokens_per_min"],
         )
 
