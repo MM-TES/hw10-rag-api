@@ -36,7 +36,7 @@ dependencies = [
     "alembic>=1.13",
 
     # --- Observability
-    "langfuse>=2.50",
+    "langfuse>=4.0",
     "structlog>=24.4",
 
     # --- Utils
