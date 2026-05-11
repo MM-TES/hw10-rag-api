@@ -1,0 +1,53 @@
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtualenvs
+.venv/
+venv/
+env/
+
+# Test / lint caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+.coverage.*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project artifacts (regeneratable, don't commit)
+# Note: pattern is `<dir>/*` (not `<dir>/`) so that `!<dir>/.gitkeep` exceptions work —
+# git's negation rules don't apply if the parent directory itself is excluded.
+data/source.md
+logs/*
+!logs/.gitkeep
+*.log
+experiments/results/*
+!experiments/results/.gitkeep
+report/output/*
+!report/output/.gitkeep
+
+# Local Docker / fly state
+.fly/
+docker-compose.override.yml

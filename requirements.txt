@@ -1,0 +1,49 @@
+# =============================================================================
+# Source of truth: pyproject.toml ([project.dependencies] + optional groups).
+# This file is provided for environments that prefer `pip install -r requirements.txt`
+# (e.g. Docker images, CI runners that don't run `pip install -e .`).
+# Keep in sync when bumping versions in pyproject.toml.
+# =============================================================================
+
+# --- FastAPI stack
+fastapi>=0.115
+uvicorn[standard]>=0.32
+pydantic>=2.9
+pydantic-settings>=2.6
+
+# --- LLM
+openai>=1.50
+anthropic>=0.39
+
+# --- RAG
+sentence-transformers>=3.2
+qdrant-client>=1.12
+langchain-text-splitters>=0.3
+tiktoken>=0.8
+pypdf>=5.0
+
+# --- Storage
+redis>=5.2
+httpx>=0.27
+asyncpg>=0.29
+sqlalchemy[asyncio]>=2.0
+alembic>=1.13
+
+# --- Observability
+langfuse>=2.50
+structlog>=24.4
+
+# --- Utils
+python-dotenv>=1.0
+tenacity>=9.0
+
+# --- Dev (optional — install via `pip install -e .[dev]` instead if possible)
+pytest>=8.3
+pytest-asyncio>=0.24
+ruff>=0.7
+
+# --- Report (optional — Phase 2 only)
+# matplotlib>=3.9
+# pandas>=2.2
+# weasyprint>=63           # Windows needs GTK runtime, see SETUP.md
+# jinja2>=3.1

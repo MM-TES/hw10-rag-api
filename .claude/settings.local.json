@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uvicorn app.main:app:*)",
+      "Bash(python scripts/verify_*.py)",
+      "Bash(python scripts/verify_all.py)",
+      "Bash(python scripts/index.py:*)",
+      "Bash(python scripts/download_doc.py:*)",
+      "Bash(python verify_smoke.py)",
+      "Bash(python experiments/preflight.py)",
+      "Bash(python experiments/run_all.py:*)",
+      "Bash(python report/generate.py:*)",
+      "Bash(pytest:*)",
+      "Bash(ruff:*)",
+      "Bash(curl -N localhost:8000/*)",
+      "Bash(curl localhost:8000/*)",
+      "Bash(curl http://localhost:8000/*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(python -m alembic:*)",
+      "Bash(python -c:*)",
+      "PowerShell(Get-Content:*)",
+      "PowerShell(Test-Path:*)",
+      "PowerShell(Copy-Item .env.example .env)"
+    ],
+    "deny": [
+      "Write(./.env)",
+      "Edit(./.env)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(fly deploy:*)",
+      "Bash(rm -rf:*)",
+      "PowerShell(Remove-Item -Recurse -Force:*)"
+    ]
+  }
+}
