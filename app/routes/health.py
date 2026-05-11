@@ -23,7 +23,7 @@ async def _ping_redis(redis) -> str:
 
 async def _ping_qdrant(qdrant) -> str:
     try:
-        await asyncio.wait_for(qdrant.get_collections(), timeout=2.0)
+        await asyncio.wait_for(asyncio.to_thread(qdrant.get_collections), timeout=2.0)
         return "ok"
     except Exception as e:
         log.warning("health_qdrant_failed", error=str(e))

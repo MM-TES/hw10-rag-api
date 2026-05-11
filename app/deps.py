@@ -8,7 +8,7 @@ import httpx
 import structlog
 from fastapi import FastAPI
 from openai import AsyncOpenAI
-from qdrant_client import AsyncQdrantClient
+from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
 from sentence_transformers import SentenceTransformer
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
@@ -56,11 +56,10 @@ class UpstashRedis:
         await self.client.aclose()
 
 
-async def _ensure_qdrant_collections(client: AsyncQdrantClient) -> None:
+def _ensure_qdrant_collections(client: QdrantClient) -> None:
     for name in (settings.QDRANT_CHUNKS_COLLECTION, settings.QDRANT_CACHE_COLLECTION):
-        exists = await client.collection_exists(name)
-        if not exists:
-            await client.create_collection(
+        if not client.collection_exists(name):
+            client.create_collection(
                 collection_name=name,
                 vectors_config=VectorParams(size=384, distance=Distance.COSINE),
             )
@@ -73,12 +72,12 @@ async def lifespan(app: FastAPI):
 
     embedder = SentenceTransformer(settings.EMBEDDING_MODEL.split("/", 1)[-1])
 
-    qdrant = AsyncQdrantClient(
+    qdrant = QdrantClient(
         url=settings.QDRANT_URL,
         api_key=settings.QDRANT_API_KEY,
         timeout=30,
     )
-    await _ensure_qdrant_collections(qdrant)
+    _ensure_qdrant_collections(qdrant)
 
     redis = UpstashRedis(settings.UPSTASH_REDIS_REST_URL, settings.UPSTASH_REDIS_REST_TOKEN)
 
@@ -130,7 +129,7 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             log.warning("langfuse_flush_failed", error=str(e))
         await redis.close()
-        await qdrant.close()
+        qdrant.close()
         await db_engine.dispose()
         await openrouter.close()
         log.info("lifespan_done")
