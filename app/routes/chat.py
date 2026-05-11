@@ -15,6 +15,12 @@ from app.cache.semantic import cache_lookup, cache_store
 from app.config import settings
 from app.llm.pricing import calc_cost
 from app.llm.router import stream_with_fallback
+from app.observability.langfuse_client import (
+    make_generation_span,
+    make_span,
+    safe_update,
+    trace_chat_request,
+)
 from app.rag.embedder import embed
 from app.rag.prompt import build_messages
 from app.rag.retriever import retrieve
@@ -65,14 +71,18 @@ async def chat_stream(
         )
 
     started = time.perf_counter()
-    query_vec = await embed(state.embedder, body.message)
+    with make_span("embed_query", {"chars": len(body.message)}) as embed_span:
+        query_vec = await embed(state.embedder, body.message)
+        safe_update(embed_span, output={"dim": len(query_vec)})
 
     cache_payload = None
     if settings.ENABLE_CACHE:
-        try:
-            cache_payload = await cache_lookup(state.qdrant, query_vec)
-        except Exception as e:
-            log.warning("cache_lookup_failed", error=str(e))
+        with make_span("cache_lookup", {"threshold": settings.CACHE_SIMILARITY_THRESHOLD}) as c_span:
+            try:
+                cache_payload = await cache_lookup(state.qdrant, query_vec)
+                safe_update(c_span, output={"hit": cache_payload is not None})
+            except Exception as e:
+                log.warning("cache_lookup_failed", error=str(e))
 
     if cache_payload:
         return StreamingResponse(
@@ -86,7 +96,9 @@ async def chat_stream(
             media_type="text/event-stream",
         )
 
-    chunks = await retrieve(state.qdrant, query_vec)
+    with make_span("vector_search", {"top_k": settings.TOP_K}) as v_span:
+        chunks = await retrieve(state.qdrant, query_vec)
+        safe_update(v_span, output={"hits": len(chunks)})
     if not chunks:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -180,25 +192,35 @@ async def _llm_stream(
         fallback_used = False
         error_detail: str | None = None
 
-        async for chunk in stream_with_fallback(
-            state.openrouter, key_data["models"], messages
-        ):
-            if await request.is_disconnected():
-                state.aborted_streams += 1
-                log.info("client_disconnected", api_key=key_data["api_key"])
-                return
-            t = chunk.get("type")
-            if t == "token":
-                if ttft_ms is None:
-                    ttft_ms = int((time.perf_counter() - started) * 1000)
-                yield sse({"type": "token", "content": chunk["content"]})
-            elif t == "done":
-                full_text = chunk["full_text"]
-                usage = chunk["usage"]
-                model_used = chunk["model"]
-                fallback_used = chunk["fallback_used"]
-            elif t == "error":
-                error_detail = chunk.get("detail", "all_models_failed")
+        async with state.llm_semaphore:
+            with make_generation_span("llm_call", key_data["models"][0], {"models": key_data["models"]}) as gen_span:
+                async for chunk in stream_with_fallback(
+                    state.openrouter, key_data["models"], messages
+                ):
+                    if await request.is_disconnected():
+                        state.aborted_streams += 1
+                        log.info("client_disconnected", api_key=key_data["api_key"])
+                        return
+                    t = chunk.get("type")
+                    if t == "token":
+                        if ttft_ms is None:
+                            ttft_ms = int((time.perf_counter() - started) * 1000)
+                        yield sse({"type": "token", "content": chunk["content"]})
+                    elif t == "done":
+                        full_text = chunk["full_text"]
+                        usage = chunk["usage"]
+                        model_used = chunk["model"]
+                        fallback_used = chunk["fallback_used"]
+                    elif t == "error":
+                        error_detail = chunk.get("detail", "all_models_failed")
+                safe_update(
+                    gen_span,
+                    output={"response": full_text[:1000]},
+                    usage_details={
+                        "input": usage.get("prompt_tokens", 0),
+                        "output": usage.get("completion_tokens", 0),
+                    },
+                )
 
         if error_detail:
             yield sse({"type": "error", "error": error_detail})

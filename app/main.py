@@ -33,6 +33,10 @@ app = FastAPI(
 
 from app.routes.health import router as health_router  # noqa: E402
 from app.routes.chat import router as chat_router  # noqa: E402
+from app.routes.usage import router as usage_router  # noqa: E402
+from app.routes.admin import router as admin_router  # noqa: E402
 
 app.include_router(health_router, tags=["health"])
 app.include_router(chat_router, tags=["chat"])
+app.include_router(usage_router, tags=["usage"])
+app.include_router(admin_router, tags=["admin"])
