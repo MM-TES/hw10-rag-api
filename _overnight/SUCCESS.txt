@@ -1,0 +1,28 @@
+﻿Phase 1 SUCCESS at 2026-05-12 01:17:41
+
+Local smoke test: 10/10 scenarios passed (scripts/verify_smoke.py)
+  01 GET /health == 200, status ok
+  02 POST /chat/stream no key -> 401
+  03 chat/stream valid -> tokens + sources
+  04 repeat -> cache_hit=true
+  05 demo-free bucket > limit -> 429 (deterministic via Redis pre-seed)
+  06 injection input -> 400
+  07 /health exposes stream counters
+  08 /usage/today after activity
+  09 request_logs has rows (via /usage/breakdown)
+  10 Langfuse trace (manual: check dashboard)
+
+Fly deploy: SKIPPED (FLY_API_TOKEN in .env returns 401 from flyctl;
+  Dockerfile + fly.toml committed for manual deploy).
+
+Local service: operational. Start with:
+  cd hw10-rag-api
+  .\.venv\Scripts\python.exe -m uvicorn app.main:app --port 8000
+  Invoke-WebRequest http://localhost:8000/health
+
+NEXT STEPS for the user (2026-05-12 morning):
+1. Review _overnight/progress.log for full timeline + verify_smoke*.log
+2. (Optional) To deploy to Fly.io: run 'flyctl auth login' in hw10-rag-api/,
+   then 'flyctl deploy --remote-only --strategy immediate'
+3. Verify Langfuse dashboard at https://cloud.langfuse.com has traces from smoke
+4. Phase 2 ready to start: experiments/ + report/ per CLAUDE_CODE_PHASE2.md
