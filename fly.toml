@@ -1,0 +1,45 @@
+app = "hw10-rag-api"
+primary_region = "fra"
+
+[build]
+
+[env]
+  PORT = "8000"
+  APP_ENV = "production"
+  LOG_LEVEL = "INFO"
+  EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+  MAX_CONCURRENT_LLM_CALLS = "20"
+  CHUNK_SIZE = "500"
+  CHUNK_OVERLAP = "50"
+  TOP_K = "3"
+  CACHE_SIMILARITY_THRESHOLD = "0.92"
+  CACHE_TTL_SECONDS = "3600"
+  LLM_TIMEOUT_SECONDS = "15"
+  CIRCUIT_BREAKER_FAILURE_THRESHOLD = "5"
+  CIRCUIT_BREAKER_WINDOW_SECONDS = "60"
+  CIRCUIT_BREAKER_OPEN_SECONDS = "60"
+  ENABLE_CACHE = "true"
+  ENABLE_FALLBACK = "true"
+  ENABLE_INJECTION_DEFENSE = "true"
+  LANGFUSE_HOST = "https://cloud.langfuse.com"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "30s"
+    method = "GET"
+    path = "/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1
