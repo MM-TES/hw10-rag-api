@@ -164,7 +164,7 @@ Phase 2 — 8 експериментів про trade-offs RAG-системи + 
 
 Відкрити: `start report\output\HW10_Report.html`. 8 експериментів, 9 фігур (matplotlib), таблиці CSV, секція cross-insights, повний eval dataset у Appendix.
 
-### Експерименти (8 шт)
+### Експерименти (9 шт)
 
 1. **EXP-01 Chunking sweep** — chunk_size ∈ {200, 350, 500, 750, 1000}, тимчасові Qdrant-колекції, gpt-4o-mini.
 2. **EXP-02 Top-K sweep** — top_k ∈ {1, 2, 3, 5, 8} на найкращому chunk_size з EXP-01.
@@ -174,20 +174,27 @@ Phase 2 — 8 експериментів про trade-offs RAG-системи + 
 6. **EXP-06 Fallback observed** — SQL агрегація `request_logs`.
 7. **EXP-07 Injection suite** — 30 атак, 6 категорій (direct/role/leak/encoded/multi/indirect).
 8. **EXP-08 Cost projection** — 1k/10k/100k req/day × cache hit-rate {0, 30, 60}%.
+9. **EXP-09 Inter-rater agreement** — Spearman ρ / Kendall τ / MAD між Haiku 4.5 та gpt-4o-mini як суддями на тих самих (Q, A) парах.
 
-### Phase 2 top-level numbers
+### Methodology: dual-judge
+
+EXP-01/02/04/07 використовують **двох суддів паралельно** — Claude **Haiku 4.5** (Anthropic) та **gpt-4o-mini** (OpenAI via OpenRouter). Це знижує single-judge self-bias (різні моделі-родини) і дає прямий signal на узгодженість через EXP-09. У звітних CSV є по три набори стовпців: `*_haiku_avg`, `*_4omini_avg`, та headline `judge_*_avg` (середнє обох). Per-question raw scores зберігаються у `experiments/results/exp{01,02,04}_raw.csv`. EXP-07 ambiguous cases класифікуються як `attack_succeeded` тільки якщо обидва судді кажуть "yes"; `judge_disagreement` — нова категорія для розбіжностей.
+
+### Phase 2 top-level numbers (dual-judge mean)
 
 | Метрика | Знахідка |
 |---|---|
-| Best chunk_size (EXP-01) | **750** (F=5.0 R=5.0 C=4.9; 68 чанків у індексі) |
-| Best top_k (EXP-02) | **3** (плато якості від k=1 до k=5, лінійний ріст input tokens) |
+| Best chunk_size (EXP-01) | **350** (F/R/C 5.0/5.0/4.8 mean; 157 чанків) — попередній best=750 знизився після dual-judge до 5.0/4.8/4.7 |
+| Best top_k (EXP-02) | **3** (плато якості k=3..8, лінійний ріст input tokens × 3.5 на проміжку) |
 | Recommended cache threshold (EXP-03) | **0.85** (TPR=13%, FPR=0% — нульові false positives) |
-| Best cost/quality model (EXP-04) | **openai/gpt-4o-mini** (F/R/C 5.0/5.0/4.9, ttft p50 836 ms, $0.0001/req) |
-| Cheapest viable model (EXP-04) | **meta-llama/llama-3.1-8b-instruct** ($0.000024/req, F/R/C 4.9/5.0/4.7) |
+| Best cost/quality model (EXP-04) | **openai/gpt-4o-mini** (F/R/C 5.0/5.0/4.85 mean, ttft p50 737 ms, $0.000064/req) |
+| Cheapest viable model (EXP-04) | **meta-llama/llama-3.1-8b-instruct** ($0.000016/req, F/R/C 4.95/4.8/4.45 mean) |
+| Несподіване в EXP-04 | gpt-4o програє gpt-4o-mini у completeness (4.1 vs 4.85 mean) — обидва судді згодні |
 | p95 latency @ 10 concurrent (EXP-05) | 71.9 s (Fly.io shared-cpu-1x під 10× SSE — значна деградація) |
-| Injection success rate (EXP-07) | **1/30 = 3.3%** (8 blocked-at-input, 21 defended-at-output) |
+| Injection success rate (EXP-07) | **1/30 = 3.3%** (a24 multi_step, обидва судді згодні; 8 blocked-input, 21 defended) |
 | Projected cost @ 10k req/day, 30% cache (EXP-08) | **~$1.93/day** на default tier mix free60/pro30/ent10 |
-| Total Phase 2 spend (tracked prod + direct) | < $0.15 (budget guard cap = $5.00) |
+| Inter-rater agreement (EXP-09, all 140 pairs) | faithfulness ρ=0.62 / agree 94% · relevance ρ=0.48 / 91% · completeness ρ=0.40 / 79% |
+| Total Phase 2 spend (tracked prod + direct) | < $0.30 (budget guard cap = $5.00) |
 
 ### Workflow
 

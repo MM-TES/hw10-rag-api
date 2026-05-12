@@ -13,22 +13,29 @@ HTML = Path("report/output/HW10_Report.html")
 CACHE = Path("report/output/_interpretations.json")
 
 
+HEADER_PREFIX = {"h1": "# ", "h2": "## ", "h3": "### ", "h4": "#### "}
+
+
+def _ul_to_md(ul) -> str:
+    items = []
+    for li in ul.find_all("li", recursive=False):
+        text = li.get_text(" ", strip=True)
+        items.append(f"- {text}")
+    return "\n".join(items)
+
+
 def _div_to_markdown(div) -> str:
-    """Reconstruct markdown-like text from a <div class="interpretation"> by joining inner <p> blocks with blank lines.
-    Also collapse `<br>` to `\n` for the executive/cross divs (rendered earlier with replace('\n', '<br>'))."""
-    # Strategy: walk children, accumulate text, treat <br> as newline and <p> blocks as paragraph separators.
-    lines: list[str] = []
-    current: list[str] = []
+    """Reconstruct markdown-like text from an interpretation block.
 
-    def flush():
-        if current:
-            lines.append(" ".join(current).strip())
-            current.clear()
-
+    Walks block-level children (h1..h4, p, ul, ol, pre, br) and emits a
+    markdown-ish string suitable for re-rendering via python-markdown.
+    """
+    blocks: list[str] = []
     for el in div.children:
-        if getattr(el, "name", None) == "p":
-            flush()
-            # walk paragraph contents, treating <br> as newlines
+        name = getattr(el, "name", None)
+        if name in HEADER_PREFIX:
+            blocks.append(HEADER_PREFIX[name] + el.get_text(" ", strip=True))
+        elif name == "p":
             paragraph_lines: list[str] = []
             buf: list[str] = []
             for sub in el.children:
@@ -40,15 +47,18 @@ def _div_to_markdown(div) -> str:
                     buf.append(text)
             if buf:
                 paragraph_lines.append("".join(buf).strip())
-            lines.append("\n".join(paragraph_lines).strip())
-            lines.append("")  # blank line between paragraphs
-        elif getattr(el, "name", None) == "br":
-            current.append("\n")
-        else:
-            text = el.get_text() if hasattr(el, "get_text") else str(el)
-            current.append(text)
-    flush()
-    return "\n".join(lines).strip()
+            blocks.append("\n".join(paragraph_lines).strip())
+        elif name in ("ul", "ol"):
+            blocks.append(_ul_to_md(el))
+        elif name in ("pre", "code"):
+            txt = el.get_text("\n", strip=True)
+            blocks.append("```\n" + txt + "\n```")
+        elif name is None:
+            # bare text or whitespace
+            s = str(el).strip()
+            if s:
+                blocks.append(s)
+    return "\n\n".join(b for b in blocks if b).strip()
 
 
 def main() -> None:

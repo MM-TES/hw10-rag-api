@@ -32,7 +32,7 @@ from experiments.common import (
     write_csv,
     write_log,
 )
-from experiments.judge import judge_answer
+from experiments.judge import dual_judge
 
 ALL_MODELS = [
     "meta-llama/llama-3.1-8b-instruct",
@@ -141,11 +141,13 @@ async def run() -> dict[str, Any]:
     retrieved_cache = {q["id"]: await _retrieve(collection, qvecs[q["id"]], TOP_K) for q in eval_qs}
 
     rows: list[dict] = []
+    raw_rows: list[dict] = []
     aborted = False
 
     try:
         for model in models:
-            faith, rel, comp = [], [], []
+            f_h, r_h, c_h = [], [], []
+            f_o, r_o, c_o = [], [], []
             ttfts: list[float] = []
             latencies: list[float] = []
             costs: list[float] = []
@@ -175,26 +177,47 @@ async def run() -> dict[str, Any]:
                     resp["usage"]["completion_tokens"],
                 )
                 costs.append(cost)
-                judged = await judge_answer(
+                judged = await dual_judge(
                     q["question"],
                     q.get("expected_keywords", []),
                     resp["content"],
                     category=q["category"],
                 )
-                faith.append(judged["faithfulness"])
-                rel.append(judged["relevance"])
-                comp.append(judged["completeness"])
+                h, o = judged["haiku"], judged["openai_mini"]
+                f_h.append(h["faithfulness"]); r_h.append(h["relevance"]); c_h.append(h["completeness"])
+                f_o.append(o["faithfulness"]); r_o.append(o["relevance"]); c_o.append(o["completeness"])
+                raw_rows.append(
+                    {
+                        "exp_id": "exp04",
+                        "param_label": "model",
+                        "param_value": model,
+                        "question_id": q["id"],
+                        "category": q["category"],
+                        "f_haiku": h["faithfulness"], "r_haiku": h["relevance"], "c_haiku": h["completeness"],
+                        "f_4omini": o["faithfulness"], "r_4omini": o["relevance"], "c_4omini": o["completeness"],
+                    }
+                )
                 calls += 1
 
             if calls > 0:
+                def avg(xs):
+                    pos = [x for x in xs if (x or 0) > 0]
+                    return round(sum(pos) / len(pos), 3) if pos else 0.0
+
+                f_mean = [(a + b) / 2 for a, b in zip(f_h, f_o) if a > 0 and b > 0]
+                r_mean = [(a + b) / 2 for a, b in zip(r_h, r_o) if a > 0 and b > 0]
+                c_mean = [(a + b) / 2 for a, b in zip(c_h, c_o) if a > 0 and b > 0]
+
                 rows.append(
                     {
                         "model": model,
                         "n_requests": calls,
                         "errors": errors,
-                        "faithfulness_avg": round(sum(faith) / len(faith), 3),
-                        "relevance_avg": round(sum(rel) / len(rel), 3),
-                        "completeness_avg": round(sum(comp) / len(comp), 3),
+                        "faithfulness_avg": round(sum(f_mean) / len(f_mean), 3) if f_mean else 0.0,
+                        "relevance_avg": round(sum(r_mean) / len(r_mean), 3) if r_mean else 0.0,
+                        "completeness_avg": round(sum(c_mean) / len(c_mean), 3) if c_mean else 0.0,
+                        "f_haiku_avg": avg(f_h), "r_haiku_avg": avg(r_h), "c_haiku_avg": avg(c_h),
+                        "f_4omini_avg": avg(f_o), "r_4omini_avg": avg(r_o), "c_4omini_avg": avg(c_o),
                         "ttft_p50": round(p50(ttfts), 1),
                         "ttft_p95": round(p95(ttfts), 1),
                         "latency_p50": round(p50(latencies), 1),
@@ -204,13 +227,12 @@ async def run() -> dict[str, Any]:
                     }
                 )
                 write_log(
-                    f"[exp04] {model}: F/R/C="
+                    f"[exp04] {model}: F/R/C(mean)="
                     f"{rows[-1]['faithfulness_avg']}/"
                     f"{rows[-1]['relevance_avg']}/"
                     f"{rows[-1]['completeness_avg']} "
-                    f"ttft_p50={rows[-1]['ttft_p50']}ms "
-                    f"lat_p50={rows[-1]['latency_p50']}ms "
-                    f"cost/req=${rows[-1]['cost_per_request_avg']:.5f}"
+                    f"(haiku F={rows[-1]['f_haiku_avg']} | 4o-mini F={rows[-1]['f_4omini_avg']}) "
+                    f"ttft_p50={rows[-1]['ttft_p50']}ms cost/req=${rows[-1]['cost_per_request_avg']:.5f}"
                 )
             else:
                 write_log(f"[exp04] {model}: no successful calls (errors={errors})")
@@ -219,6 +241,7 @@ async def run() -> dict[str, Any]:
     finally:
         qdrant_delete_collection(collection)
         write_csv("experiments/results/exp04_models.csv", rows)
+        write_csv("experiments/results/exp04_raw.csv", raw_rows)
 
     write_log(f"[exp04] END — {len(rows)} models reported; aborted={aborted}")
     return {

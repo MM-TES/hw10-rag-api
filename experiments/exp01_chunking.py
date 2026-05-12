@@ -33,7 +33,7 @@ from experiments.common import (
     write_csv,
     write_log,
 )
-from experiments.judge import judge_answer
+from experiments.judge import dual_judge
 
 SOURCE = Path("data/source.md")
 CHUNK_SIZES = [200, 350, 500, 750, 1000]
@@ -107,6 +107,7 @@ async def run() -> dict[str, Any]:
     eval_qs = eval_factual_comparative(load_eval_questions())
 
     rows: list[dict] = []
+    raw_rows: list[dict] = []
     temp_collections: list[str] = []
     aborted = False
 
@@ -118,7 +119,8 @@ async def run() -> dict[str, Any]:
             n_chunks = _build_collection(collection, chunks)
             write_log(f"[exp01] cs={chunk_size}: {n_chunks} chunks indexed in {collection}")
 
-            faith, rel, comp = [], [], []
+            f_h, r_h, c_h = [], [], []
+            f_o, r_o, c_o = [], [], []
             input_tokens_sum = 0
             cost_sum = 0.0
             calls = 0
@@ -146,35 +148,57 @@ async def run() -> dict[str, Any]:
                 cost_sum += cost
                 input_tokens_sum += resp["usage"]["prompt_tokens"]
 
-                judged = await judge_answer(
+                judged = await dual_judge(
                     q["question"],
                     q.get("expected_keywords", []),
                     resp["content"],
                     category=q["category"],
                 )
-                faith.append(judged["faithfulness"])
-                rel.append(judged["relevance"])
-                comp.append(judged["completeness"])
+                h, o = judged["haiku"], judged["openai_mini"]
+                f_h.append(h["faithfulness"]); r_h.append(h["relevance"]); c_h.append(h["completeness"])
+                f_o.append(o["faithfulness"]); r_o.append(o["relevance"]); c_o.append(o["completeness"])
+                raw_rows.append(
+                    {
+                        "exp_id": "exp01",
+                        "param_label": "chunk_size",
+                        "param_value": chunk_size,
+                        "question_id": q["id"],
+                        "category": q["category"],
+                        "f_haiku": h["faithfulness"], "r_haiku": h["relevance"], "c_haiku": h["completeness"],
+                        "f_4omini": o["faithfulness"], "r_4omini": o["relevance"], "c_4omini": o["completeness"],
+                    }
+                )
                 calls += 1
 
             if calls > 0:
+                def avg(xs, by=None):
+                    pos = [x for x in xs if (x or 0) > 0]
+                    return round(sum(pos) / len(pos), 3) if pos else 0.0
+
+                f_mean = [(a + b) / 2 for a, b in zip(f_h, f_o) if a > 0 and b > 0]
+                r_mean = [(a + b) / 2 for a, b in zip(r_h, r_o) if a > 0 and b > 0]
+                c_mean = [(a + b) / 2 for a, b in zip(c_h, c_o) if a > 0 and b > 0]
+
                 rows.append(
                     {
                         "chunk_size": chunk_size,
                         "num_chunks": n_chunks,
                         "n_eval_calls": calls,
-                        "judge_faithfulness_avg": round(sum(faith) / len(faith), 3),
-                        "judge_relevance_avg": round(sum(rel) / len(rel), 3),
-                        "judge_completeness_avg": round(sum(comp) / len(comp), 3),
+                        "judge_faithfulness_avg": round(sum(f_mean) / len(f_mean), 3) if f_mean else 0.0,
+                        "judge_relevance_avg": round(sum(r_mean) / len(r_mean), 3) if r_mean else 0.0,
+                        "judge_completeness_avg": round(sum(c_mean) / len(c_mean), 3) if c_mean else 0.0,
+                        "f_haiku_avg": avg(f_h), "r_haiku_avg": avg(r_h), "c_haiku_avg": avg(c_h),
+                        "f_4omini_avg": avg(f_o), "r_4omini_avg": avg(r_o), "c_4omini_avg": avg(c_o),
                         "avg_input_tokens": round(input_tokens_sum / calls, 1),
                         "total_cost_usd": round(cost_sum, 6),
                     }
                 )
                 write_log(
                     f"[exp01] cs={chunk_size} done: "
-                    f"F={rows[-1]['judge_faithfulness_avg']} "
-                    f"R={rows[-1]['judge_relevance_avg']} "
-                    f"C={rows[-1]['judge_completeness_avg']} "
+                    f"F(mean)={rows[-1]['judge_faithfulness_avg']} "
+                    f"R(mean)={rows[-1]['judge_relevance_avg']} "
+                    f"C(mean)={rows[-1]['judge_completeness_avg']} "
+                    f"(haiku F={rows[-1]['f_haiku_avg']} | 4o-mini F={rows[-1]['f_4omini_avg']}) "
                     f"cost=${rows[-1]['total_cost_usd']:.4f}"
                 )
 
@@ -185,6 +209,7 @@ async def run() -> dict[str, Any]:
         for col in temp_collections:
             qdrant_delete_collection(col)
         write_csv("experiments/results/exp01_chunking.csv", rows)
+        write_csv("experiments/results/exp01_raw.csv", raw_rows)
 
     write_log(f"[exp01] END — {len(rows)} rows saved; aborted={aborted}")
     return {"ok": not aborted and bool(rows), "rows": len(rows)}

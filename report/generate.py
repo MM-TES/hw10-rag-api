@@ -134,6 +134,13 @@ EXP_META = {
         "key_metrics": "blended_cost_per_request, cost_per_day_usd, cost_per_month_usd",
         "figures": ["exp08"],
     },
+    "exp09": {
+        "title": "Inter-rater agreement (Haiku 4.5 vs gpt-4o-mini as judge)",
+        "hypothesis": "Якщо два судді з різних родин (Anthropic vs OpenAI) показують високу rank-кореляцію (ρ ≥ 0.7) на ідентичних (Q, A) парах — головна метрика (mean) є робастною до single-judge bias. Faithfulness як найбільш фактологічна метрика має давати найвищу згоду; completeness — найменшу.",
+        "setup": "Усі (question, answer) пари з EXP-01/02/04 (raw CSVs) — 140 пар × 3 метрики (faithfulness, relevance, completeness). Для кожної (experiment × metric) комбінації обчислюємо Spearman ρ, Kendall τ, Pearson r, mean |Haiku - 4o-mini| та exact-agreement-rate. Без жодних нових LLM-викликів.",
+        "key_metrics": "spearman_rho, kendall_tau, pearson_r, mean_abs_diff, agreement_exact, haiku_mean, 4omini_mean",
+        "figures": ["exp09"],
+    },
 }
 
 
@@ -148,6 +155,7 @@ def _load_csvs() -> dict[str, pd.DataFrame]:
         "exp06": "exp06_fallback_observed.csv",
         "exp07": "exp07_injection.csv",
         "exp08": "exp08_cost_projection.csv",
+        "exp09": "exp09_judge_agreement.csv",
     }
     for exp_id, fname in mapping.items():
         path = RESULTS_DIR / fname
@@ -221,17 +229,19 @@ async def main() -> None:
         "exp06": ("exp06", plots.plot_exp06_fallback),
         "exp07": ("exp07", plots.plot_exp07_injection),
         "exp08": ("exp08", plots.plot_exp08_cost_projection),
+        "exp09": ("exp09", plots.plot_exp09_judge_agreement),
     }
     captions = {
-        "exp01": "Chunk size sweep — quality and chunk count.",
-        "exp02": "Top-K sweep — quality vs prompt size.",
+        "exp01": "Chunk size sweep — dual-judge mean + per-judge faithfulness overlay.",
+        "exp02": "Top-K sweep — dual-judge mean + per-judge completeness overlay.",
         "exp03": "Cache similarity threshold — TPR / FPR.",
-        "exp04_pareto": "Cost vs quality scatter (log cost).",
+        "exp04_pareto": "Cost vs quality scatter (log cost, dual-judge mean).",
         "exp04_latency": "TTFT vs total latency, p50.",
         "exp05": "Load test — p50/p95 latency at concurrency 2/5/10.",
         "exp06": "Observed fallback frequency per model.",
         "exp07": "Injection outcomes per category.",
         "exp08": "Daily cost projection at scale.",
+        "exp09": "Inter-rater agreement (Spearman ρ + exact agreement + MAD).",
     }
     for fig_key, (exp_id, fn) in plot_map.items():
         df = results.get(exp_id)

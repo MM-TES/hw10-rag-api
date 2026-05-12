@@ -27,33 +27,39 @@ def _save(fig, name: str) -> Path:
 
 def plot_exp01_chunking(df: pd.DataFrame) -> Path:
     fig, ax = plt.subplots(figsize=(8, 5))
-    ax.plot(df["chunk_size"], df["judge_faithfulness_avg"], marker="o", label="Faithfulness")
-    ax.plot(df["chunk_size"], df["judge_relevance_avg"], marker="s", label="Relevance")
-    ax.plot(df["chunk_size"], df["judge_completeness_avg"], marker="^", label="Completeness")
+    ax.plot(df["chunk_size"], df["judge_faithfulness_avg"], marker="o", label="Faithfulness (mean)")
+    ax.plot(df["chunk_size"], df["judge_relevance_avg"], marker="s", label="Relevance (mean)")
+    ax.plot(df["chunk_size"], df["judge_completeness_avg"], marker="^", label="Completeness (mean)")
+    if "f_haiku_avg" in df.columns and "f_4omini_avg" in df.columns:
+        ax.plot(df["chunk_size"], df["f_haiku_avg"], marker=".", linestyle=":", color="C0", alpha=0.5, label="F (haiku)")
+        ax.plot(df["chunk_size"], df["f_4omini_avg"], marker="x", linestyle=":", color="C0", alpha=0.5, label="F (4o-mini)")
     ax2 = ax.twinx()
     ax2.bar(df["chunk_size"], df["num_chunks"], width=40, alpha=0.15, color="gray", label="Chunks")
     ax2.set_ylabel("# chunks in index", color="gray")
     ax.set_xlabel("Chunk size (characters)")
     ax.set_ylabel("Judge score (1-5)")
-    ax.set_title("EXP-01: Chunk size vs answer quality (gpt-4o-mini, top-3)")
-    ax.set_ylim(0, 5.5)
-    ax.legend(loc="lower right")
+    ax.set_title("EXP-01: Chunk size vs answer quality (dual judge mean, gpt-4o-mini, top-3)")
+    ax.set_ylim(3.5, 5.2)
+    ax.legend(loc="lower right", fontsize=8)
     return _save(fig, "exp01_chunking")
 
 
 def plot_exp02_topk(df: pd.DataFrame) -> Path:
     fig, ax = plt.subplots(figsize=(8, 5))
-    ax.plot(df["top_k"], df["judge_faithfulness_avg"], marker="o", label="Faithfulness")
-    ax.plot(df["top_k"], df["judge_relevance_avg"], marker="s", label="Relevance")
-    ax.plot(df["top_k"], df["judge_completeness_avg"], marker="^", label="Completeness")
+    ax.plot(df["top_k"], df["judge_faithfulness_avg"], marker="o", label="Faithfulness (mean)")
+    ax.plot(df["top_k"], df["judge_relevance_avg"], marker="s", label="Relevance (mean)")
+    ax.plot(df["top_k"], df["judge_completeness_avg"], marker="^", label="Completeness (mean)")
+    if "c_haiku_avg" in df.columns and "c_4omini_avg" in df.columns:
+        ax.plot(df["top_k"], df["c_haiku_avg"], marker=".", linestyle=":", color="C2", alpha=0.5, label="C (haiku)")
+        ax.plot(df["top_k"], df["c_4omini_avg"], marker="x", linestyle=":", color="C2", alpha=0.5, label="C (4o-mini)")
     ax2 = ax.twinx()
     ax2.plot(df["top_k"], df["avg_input_tokens"], color="C3", marker="x", linestyle="--", label="Avg input tokens")
     ax2.set_ylabel("Avg input tokens", color="C3")
     ax.set_xlabel("top_k")
     ax.set_ylabel("Judge score (1-5)")
-    ax.set_title("EXP-02: top-K vs quality and prompt size")
-    ax.set_ylim(0, 5.5)
-    ax.legend(loc="lower right")
+    ax.set_title("EXP-02: top-K vs quality (dual judge mean) and prompt size")
+    ax.set_ylim(3.8, 5.2)
+    ax.legend(loc="lower right", fontsize=8)
     return _save(fig, "exp02_topk")
 
 
@@ -165,6 +171,43 @@ def plot_exp07_injection(df: pd.DataFrame) -> Path:
     return _save(fig, "exp07_injection")
 
 
+def plot_exp09_judge_agreement(df: pd.DataFrame) -> Path:
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.5))
+    per_exp = df[df["experiment"] != "ALL"].copy()
+    # Bar chart: rho per (experiment × metric)
+    pivot = per_exp.pivot_table(index="experiment", columns="metric", values="spearman_rho", aggfunc="first")
+    pivot = pivot[["faithfulness", "relevance", "completeness"]] if all(c in pivot.columns for c in ["faithfulness", "relevance", "completeness"]) else pivot
+    pivot.plot(kind="bar", ax=ax1, edgecolor="black")
+    ax1.set_ylabel("Spearman ρ (Haiku vs gpt-4o-mini)")
+    ax1.set_title("Inter-rater rank correlation per experiment × metric")
+    ax1.set_ylim(-0.1, 1.05)
+    ax1.axhline(0, color="black", linewidth=0.5)
+    ax1.axhline(0.7, color="green", linewidth=0.5, linestyle="--", alpha=0.5)
+    ax1.legend(fontsize=8, loc="lower right")
+    for tick in ax1.get_xticklabels():
+        tick.set_rotation(0)
+
+    # Right: exact-agreement + MAD
+    overall = df[df["experiment"] == "ALL"]
+    metrics = overall["metric"].tolist()
+    agree = overall["agreement_exact"].tolist()
+    mad = overall["mean_abs_diff"].tolist()
+    x = range(len(metrics))
+    width = 0.35
+    ax2.bar([i - width / 2 for i in x], agree, width=width, label="Exact agreement", color="#16a34a")
+    ax2b = ax2.twinx()
+    ax2b.bar([i + width / 2 for i in x], mad, width=width, label="Mean |diff|", color="#dc2626")
+    ax2.set_xticks(list(x))
+    ax2.set_xticklabels(metrics)
+    ax2.set_ylim(0, 1.05)
+    ax2.set_ylabel("Exact agreement (share)", color="#16a34a")
+    ax2b.set_ylabel("Mean absolute diff (1-5 pts)", color="#dc2626")
+    ax2.set_title("Overall (all 140 pairs) — exact agreement and MAD")
+    ax2.legend(loc="upper left", fontsize=8)
+    ax2b.legend(loc="upper right", fontsize=8)
+    return _save(fig, "exp09_judge_agreement")
+
+
 def plot_exp08_cost_projection(df: pd.DataFrame) -> Path:
     fig, ax = plt.subplots(figsize=(8.5, 5))
     pivot = df.pivot_table(
@@ -189,4 +232,5 @@ PLOTTERS = {
     "exp06": plot_exp06_fallback,
     "exp07": plot_exp07_injection,
     "exp08": plot_exp08_cost_projection,
+    "exp09": plot_exp09_judge_agreement,
 }

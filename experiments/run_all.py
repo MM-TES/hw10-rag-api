@@ -17,6 +17,7 @@ from experiments import (
     exp06_fallback_observed,
     exp07_injection,
     exp08_cost_projection,
+    exp09_judge_agreement,
 )
 
 
@@ -29,6 +30,7 @@ EXPERIMENTS = [
     ("EXP-06", exp06_fallback_observed.run, "experiments/results/exp06_fallback_observed.csv"),
     ("EXP-07", exp07_injection.run, "experiments/results/exp07_injection.csv"),
     ("EXP-08", exp08_cost_projection.run, "experiments/results/exp08_cost_projection.csv"),
+    ("EXP-09", exp09_judge_agreement.run, "experiments/results/exp09_judge_agreement.csv"),
 ]
 
 
