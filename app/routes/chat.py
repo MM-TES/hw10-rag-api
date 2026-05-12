@@ -134,6 +134,9 @@ async def _cache_replay_stream(
         response_text: str = payload.get("response", "")
         model_used: str = payload.get("model", "cache")
         sources: list[str] = payload.get("sources", [])
+        original_input = int(payload.get("original_prompt_tokens", 0) or 0)
+        original_output = int(payload.get("original_completion_tokens", 0) or 0)
+        original_cost = float(payload.get("original_cost_usd", 0.0) or 0.0)
         ttft_ms: int | None = None
         for word in response_text.split(" "):
             if await request.is_disconnected():
@@ -152,8 +155,13 @@ async def _cache_replay_stream(
                 "fallback_used": False,
                 "cache_hit": True,
                 "sources": sources,
-                "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
-                "cost_usd": 0.0,
+                "usage": {
+                    "prompt_tokens": original_input,
+                    "completion_tokens": original_output,
+                    "total_tokens": original_input + original_output,
+                },
+                "cost_usd": round(original_cost, 8),
+                "cost_saved_usd": round(original_cost, 8),
                 "latency_ms": latency_ms,
                 "ttft_ms": ttft_ms,
             }
@@ -162,9 +170,9 @@ async def _cache_replay_stream(
             state.db_session_maker,
             api_key=key_data["api_key"],
             model=model_used,
-            input_tokens=0,
-            output_tokens=0,
-            cost_usd=0.0,
+            input_tokens=original_input,
+            output_tokens=original_output,
+            cost_usd=original_cost,
             latency_ms=latency_ms,
             ttft_ms=ttft_ms,
             cache_hit=True,
@@ -256,6 +264,9 @@ async def _llm_stream(
                     full_text,
                     model_used or "",
                     sources,
+                    original_prompt_tokens=usage.get("prompt_tokens", 0),
+                    original_completion_tokens=usage.get("completion_tokens", 0),
+                    original_cost_usd=cost,
                 )
             except Exception as e:
                 log.warning("cache_store_failed", error=str(e))

@@ -46,6 +46,9 @@ async def cache_store(
     response_text: str,
     model: str,
     sources: list[str],
+    original_prompt_tokens: int = 0,
+    original_completion_tokens: int = 0,
+    original_cost_usd: float = 0.0,
     ttl_seconds: int | None = None,
 ) -> None:
     ttl = ttl_seconds or settings.CACHE_TTL_SECONDS
@@ -60,6 +63,9 @@ async def cache_store(
             "sources": sources,
             "expire_at": now + ttl,
             "created_at": now,
+            "original_prompt_tokens": int(original_prompt_tokens),
+            "original_completion_tokens": int(original_completion_tokens),
+            "original_cost_usd": float(original_cost_usd),
         },
     )
     try:
