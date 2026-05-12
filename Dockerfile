@@ -1,19 +1,19 @@
 FROM python:3.11-slim AS base
 
-WORKDIR /app
-
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m -u 1000 app
+RUN mkdir -p /app && chown -R app:app /app
+WORKDIR /app
 USER app
 ENV PATH="/home/app/.local/bin:${PATH}"
 ENV PYTHONUNBUFFERED=1
 
 COPY --chown=app:app pyproject.toml README.md ./
 COPY --chown=app:app app/ ./app/
-RUN pip install --user --no-cache-dir -e .
+RUN pip install --user --no-cache-dir .
 
 COPY --chown=app:app scripts/ ./scripts/
 COPY --chown=app:app data/ ./data/
