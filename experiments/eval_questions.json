@@ -1,0 +1,25 @@
+[
+  {"id": "q01", "category": "factual", "question": "What is the first factor in the 12-factor methodology?", "expected_keywords": ["codebase", "one codebase", "version control"], "expected_section": "I. Codebase"},
+  {"id": "q02", "category": "factual", "question": "What does the Config factor recommend for storing configuration?", "expected_keywords": ["environment variables", "env vars", "strict separation"], "expected_section": "III. Config"},
+  {"id": "q03", "category": "factual", "question": "How should backing services be treated according to twelve-factor?", "expected_keywords": ["attached resources", "url", "swap"], "expected_section": "IV. Backing services"},
+  {"id": "q04", "category": "factual", "question": "What does the Logs factor advise about how logs should be handled?", "expected_keywords": ["event streams", "stdout", "no log files"], "expected_section": "XI. Logs"},
+  {"id": "q05", "category": "factual", "question": "What does Disposability advocate for?", "expected_keywords": ["fast startup", "graceful shutdown", "robust"], "expected_section": "IX. Disposability"},
+
+  {"id": "q06", "category": "comparative", "question": "What is the difference between Build, Release, and Run stages?", "expected_keywords": ["build", "release", "run", "config", "executable"], "expected_sections": ["V. Build, release, run"]},
+  {"id": "q07", "category": "comparative", "question": "How do Dependencies and Config factors differ in scope?", "expected_keywords": ["dependencies", "explicit", "config", "deploy", "environment"], "expected_sections": ["II. Dependencies", "III. Config"]},
+  {"id": "q08", "category": "comparative", "question": "Compare Concurrency and Disposability principles", "expected_keywords": ["processes", "concurrency", "disposable", "scale"], "expected_sections": ["VIII. Concurrency", "IX. Disposability"]},
+  {"id": "q09", "category": "comparative", "question": "How do Dev/prod parity and Build/release/run interact?", "expected_keywords": ["parity", "build", "release", "small gap"], "expected_sections": ["X. Dev/prod parity", "V. Build, release, run"]},
+  {"id": "q10", "category": "comparative", "question": "What's the relationship between Port binding and Processes?", "expected_keywords": ["port", "binding", "processes", "stateless", "self-contained"], "expected_sections": ["VII. Port binding", "VI. Processes"]},
+
+  {"id": "q11", "category": "out_of_scope", "question": "What is the recipe for borscht?", "expected_refusal": true},
+  {"id": "q12", "category": "out_of_scope", "question": "Who won the 2024 Olympics 100m sprint?", "expected_refusal": true},
+  {"id": "q13", "category": "out_of_scope", "question": "Explain quantum entanglement", "expected_refusal": true},
+  {"id": "q14", "category": "out_of_scope", "question": "What is the capital of Australia?", "expected_refusal": true},
+  {"id": "q15", "category": "out_of_scope", "question": "How does photosynthesis work?", "expected_refusal": true},
+
+  {"id": "q16", "category": "paraphrase", "question": "How should configuration be stored?", "expected_section": "III. Config", "expected_keywords": ["environment", "env"], "paraphrases": ["Where to keep config values?", "What's the recommended way to manage configuration?", "How to store config in 12-factor apps?"]},
+  {"id": "q17", "category": "paraphrase", "question": "What does the codebase factor require?", "expected_section": "I. Codebase", "expected_keywords": ["codebase", "version control"], "paraphrases": ["Tell me about the codebase principle", "Explain the codebase rule", "What's the codebase requirement?"]},
+  {"id": "q18", "category": "paraphrase", "question": "Why use port binding?", "expected_section": "VII. Port binding", "expected_keywords": ["port", "self-contained", "export"], "paraphrases": ["What's the purpose of port binding?", "Reason for port binding factor", "Why port binding factor exists?"]},
+  {"id": "q19", "category": "paraphrase", "question": "How to handle logs in 12-factor?", "expected_section": "XI. Logs", "expected_keywords": ["event streams", "stdout"], "paraphrases": ["Best practice for logging?", "Log handling in twelve-factor", "How should app logs work?"]},
+  {"id": "q20", "category": "paraphrase", "question": "What is admin processes factor?", "expected_section": "XII. Admin processes", "expected_keywords": ["one-off", "admin", "management"], "paraphrases": ["Tell me about admin processes", "Explain administrative tasks factor", "What does admin processes mean?"]}
+]
