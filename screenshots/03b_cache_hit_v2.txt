@@ -1,0 +1,346 @@
+data: {"type": "token", "content": "The "}
+
+data: {"type": "token", "content": "port "}
+
+data: {"type": "token", "content": "binding "}
+
+data: {"type": "token", "content": "factor "}
+
+data: {"type": "token", "content": "in "}
+
+data: {"type": "token", "content": "the "}
+
+data: {"type": "token", "content": "Twelve-Factor "}
+
+data: {"type": "token", "content": "App "}
+
+data: {"type": "token", "content": "methodology "}
+
+data: {"type": "token", "content": "refers "}
+
+data: {"type": "token", "content": "to "}
+
+data: {"type": "token", "content": "the "}
+
+data: {"type": "token", "content": "practice "}
+
+data: {"type": "token", "content": "of "}
+
+data: {"type": "token", "content": "exporting "}
+
+data: {"type": "token", "content": "services "}
+
+data: {"type": "token", "content": "via "}
+
+data: {"type": "token", "content": "port "}
+
+data: {"type": "token", "content": "binding. "}
+
+data: {"type": "token", "content": "This "}
+
+data: {"type": "token", "content": "means "}
+
+data: {"type": "token", "content": "that "}
+
+data: {"type": "token", "content": "an "}
+
+data: {"type": "token", "content": "application "}
+
+data: {"type": "token", "content": "can "}
+
+data: {"type": "token", "content": "run "}
+
+data: {"type": "token", "content": "as "}
+
+data: {"type": "token", "content": "a "}
+
+data: {"type": "token", "content": "process "}
+
+data: {"type": "token", "content": "that "}
+
+data: {"type": "token", "content": "listens "}
+
+data: {"type": "token", "content": "on "}
+
+data: {"type": "token", "content": "a "}
+
+data: {"type": "token", "content": "specific "}
+
+data: {"type": "token", "content": "port "}
+
+data: {"type": "token", "content": "for "}
+
+data: {"type": "token", "content": "incoming "}
+
+data: {"type": "token", "content": "requests, "}
+
+data: {"type": "token", "content": "allowing "}
+
+data: {"type": "token", "content": "it "}
+
+data: {"type": "token", "content": "to "}
+
+data: {"type": "token", "content": "serve "}
+
+data: {"type": "token", "content": "HTTP "}
+
+data: {"type": "token", "content": "or "}
+
+data: {"type": "token", "content": "other "}
+
+data: {"type": "token", "content": "types "}
+
+data: {"type": "token", "content": "of "}
+
+data: {"type": "token", "content": "requests.\n\nExamples "}
+
+data: {"type": "token", "content": "of "}
+
+data: {"type": "token", "content": "services "}
+
+data: {"type": "token", "content": "that "}
+
+data: {"type": "token", "content": "can "}
+
+data: {"type": "token", "content": "be "}
+
+data: {"type": "token", "content": "exported "}
+
+data: {"type": "token", "content": "through "}
+
+data: {"type": "token", "content": "port "}
+
+data: {"type": "token", "content": "binding "}
+
+data: {"type": "token", "content": "include:\n\n- "}
+
+data: {"type": "token", "content": "**HTTP "}
+
+data: {"type": "token", "content": "servers**: "}
+
+data: {"type": "token", "content": "These "}
+
+data: {"type": "token", "content": "are "}
+
+data: {"type": "token", "content": "the "}
+
+data: {"type": "token", "content": "most "}
+
+data: {"type": "token", "content": "common, "}
+
+data: {"type": "token", "content": "where "}
+
+data: {"type": "token", "content": "applications "}
+
+data: {"type": "token", "content": "listen "}
+
+data: {"type": "token", "content": "on "}
+
+data: {"type": "token", "content": "a "}
+
+data: {"type": "token", "content": "port "}
+
+data: {"type": "token", "content": "for "}
+
+data: {"type": "token", "content": "web "}
+
+data: {"type": "token", "content": "traffic.\n- "}
+
+data: {"type": "token", "content": "**ejabberd**: "}
+
+data: {"type": "token", "content": "This "}
+
+data: {"type": "token", "content": "is "}
+
+data: {"type": "token", "content": "an "}
+
+data: {"type": "token", "content": "XMPP "}
+
+data: {"type": "token", "content": "server "}
+
+data: {"type": "token", "content": "that "}
+
+data: {"type": "token", "content": "can "}
+
+data: {"type": "token", "content": "be "}
+
+data: {"type": "token", "content": "run "}
+
+data: {"type": "token", "content": "via "}
+
+data: {"type": "token", "content": "port "}
+
+data: {"type": "token", "content": "binding, "}
+
+data: {"type": "token", "content": "allowing "}
+
+data: {"type": "token", "content": "it "}
+
+data: {"type": "token", "content": "to "}
+
+data: {"type": "token", "content": "handle "}
+
+data: {"type": "token", "content": "instant "}
+
+data: {"type": "token", "content": "messaging.\n- "}
+
+data: {"type": "token", "content": "**Redis**: "}
+
+data: {"type": "token", "content": "This "}
+
+data: {"type": "token", "content": "is "}
+
+data: {"type": "token", "content": "an "}
+
+data: {"type": "token", "content": "in-memory "}
+
+data: {"type": "token", "content": "data "}
+
+data: {"type": "token", "content": "structure "}
+
+data: {"type": "token", "content": "store "}
+
+data: {"type": "token", "content": "that "}
+
+data: {"type": "token", "content": "also "}
+
+data: {"type": "token", "content": "uses "}
+
+data: {"type": "token", "content": "port "}
+
+data: {"type": "token", "content": "binding "}
+
+data: {"type": "token", "content": "to "}
+
+data: {"type": "token", "content": "communicate "}
+
+data: {"type": "token", "content": "via "}
+
+data: {"type": "token", "content": "its "}
+
+data: {"type": "token", "content": "own "}
+
+data: {"type": "token", "content": "protocol.\n\nThe "}
+
+data: {"type": "token", "content": "rationale "}
+
+data: {"type": "token", "content": "behind "}
+
+data: {"type": "token", "content": "port "}
+
+data: {"type": "token", "content": "binding "}
+
+data: {"type": "token", "content": "is "}
+
+data: {"type": "token", "content": "that "}
+
+data: {"type": "token", "content": "it "}
+
+data: {"type": "token", "content": "allows "}
+
+data: {"type": "token", "content": "applications "}
+
+data: {"type": "token", "content": "to "}
+
+data: {"type": "token", "content": "be "}
+
+data: {"type": "token", "content": "self-contained "}
+
+data: {"type": "token", "content": "and "}
+
+data: {"type": "token", "content": "easily "}
+
+data: {"type": "token", "content": "deployable. "}
+
+data: {"type": "token", "content": "Each "}
+
+data: {"type": "token", "content": "app "}
+
+data: {"type": "token", "content": "can "}
+
+data: {"type": "token", "content": "be "}
+
+data: {"type": "token", "content": "treated "}
+
+data: {"type": "token", "content": "as "}
+
+data: {"type": "token", "content": "a "}
+
+data: {"type": "token", "content": "service "}
+
+data: {"type": "token", "content": "that "}
+
+data: {"type": "token", "content": "can "}
+
+data: {"type": "token", "content": "be "}
+
+data: {"type": "token", "content": "accessed "}
+
+data: {"type": "token", "content": "independently, "}
+
+data: {"type": "token", "content": "facilitating "}
+
+data: {"type": "token", "content": "microservices "}
+
+data: {"type": "token", "content": "architecture "}
+
+data: {"type": "token", "content": "and "}
+
+data: {"type": "token", "content": "enabling "}
+
+data: {"type": "token", "content": "one "}
+
+data: {"type": "token", "content": "app "}
+
+data: {"type": "token", "content": "to "}
+
+data: {"type": "token", "content": "act "}
+
+data: {"type": "token", "content": "as "}
+
+data: {"type": "token", "content": "a "}
+
+data: {"type": "token", "content": "backing "}
+
+data: {"type": "token", "content": "service "}
+
+data: {"type": "token", "content": "for "}
+
+data: {"type": "token", "content": "another "}
+
+data: {"type": "token", "content": "by "}
+
+data: {"type": "token", "content": "providing "}
+
+data: {"type": "token", "content": "its "}
+
+data: {"type": "token", "content": "URL "}
+
+data: {"type": "token", "content": "in "}
+
+data: {"type": "token", "content": "the "}
+
+data: {"type": "token", "content": "configuration. "}
+
+data: {"type": "token", "content": "This "}
+
+data: {"type": "token", "content": "approach "}
+
+data: {"type": "token", "content": "enhances "}
+
+data: {"type": "token", "content": "modularity "}
+
+data: {"type": "token", "content": "and "}
+
+data: {"type": "token", "content": "scalability "}
+
+data: {"type": "token", "content": "in "}
+
+data: {"type": "token", "content": "application "}
+
+data: {"type": "token", "content": "design. "}
+
+data: {"type": "done", "model": "openai/gpt-4o-mini", "fallback_used": false, "cache_hit": true, "sources": ["chunk_0093", "chunk_0092", "chunk_0087"], "usage": {"prompt_tokens": 376, "completion_tokens": 209, "total_tokens": 585}, "cost_usd": 0.0001818, "cost_saved_usd": 0.0001818, "latency_ms": 8463, "ttft_ms": 4906}
+
+--- ELAPSED HIT: 9.027142 seconds ---
+--- RATIO MISS/HIT = 1.87x ---
