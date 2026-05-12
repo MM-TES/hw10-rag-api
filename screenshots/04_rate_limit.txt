@@ -1,0 +1,386 @@
+﻿11:45:23 Burst start
+
+=== Request #1 (Explain in detail all twelve factors with examples for each) ===
+HTTP/1.1 200 OK
+date: Tue, 12 May 2026 08:45:23 GMT
+server: Fly/a589ac11 (2026-05-08)
+content-type: text/event-stream; charset=utf-8
+transfer-encoding: chunked
+via: 1.1 fly.io
+fly-request-id: 01KRDNSG5N13899F8QDB2X4ZZH-fra
+
+data: {"type": "token", "content": "I "}
+
+data: {"type": "token", "content": "don't "}
+
+data: {"type": "token", "content": "know "}
+
+data: {"type": "token", "content": "based "}
+
+data: {"type": "token", "content": "on "}
+
+data: {"type": "token", "content": "the "}
+
+data: {"type": "token", "content": "provided "}
+
+data: {"type": "token", "content": "document. "}
+
+data: {"type": "done", "model": "openai/gpt-4o-mini", "fallback_used": false, "cache_hit": true, "sources": ["chunk_0078", "chunk_0022", "chunk_0070"], "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}, "cost_usd": 0.0, "latency_ms": 201, "ttft_ms": 36}
+
+
+=== Request #2 (Describe every twelve-factor principle thoroughly with use cases) ===
+HTTP/1.1 200 OK
+date: Tue, 12 May 2026 08:45:24 GMT
+server: Fly/a589ac11 (2026-05-08)
+content-type: text/event-stream; charset=utf-8
+transfer-encoding: chunked
+via: 1.1 fly.io
+fly-request-id: 01KRDNSH33X6BHCHMR1B7FQS4R-fra
+
+data: {"type": "token", "content": "I"}
+
+data: {"type": "token", "content": " don't"}
+
+data: {"type": "token", "content": " know"}
+
+data: {"type": "token", "content": " based"}
+
+data: {"type": "token", "content": " on"}
+
+data: {"type": "token", "content": " the"}
+
+data: {"type": "token", "content": " provided"}
+
+data: {"type": "token", "content": " document"}
+
+data: {"type": "token", "content": "."}
+
+data: {"type": "done", "model": "openai/gpt-4o-mini", "fallback_used": true, "cache_hit": false, "sources": ["chunk_0078", "chunk_0022", "chunk_0059"], "usage": {"prompt_tokens": 294, "completion_tokens": 10, "total_tokens": 304}, "cost_usd": 5.01e-05, "latency_ms": 746, "ttft_ms": 711, "output_filtered": false, "rate_limit_exceeded": false, "retry_after": 0}
+
+
+=== Request #3 (Walk me through each of the twelve factors in depth with examples) ===
+HTTP/1.1 200 OK
+date: Tue, 12 May 2026 08:45:26 GMT
+server: Fly/a589ac11 (2026-05-08)
+content-type: text/event-stream; charset=utf-8
+transfer-encoding: chunked
+via: 1.1 fly.io
+fly-request-id: 01KRDNSJJ29HR4JJZZJN8R584Q-fra
+
+data: {"type": "token", "content": "I"}
+
+data: {"type": "token", "content": " don't"}
+
+data: {"type": "token", "content": " know"}
+
+data: {"type": "token", "content": " based"}
+
+data: {"type": "token", "content": " on"}
+
+data: {"type": "token", "content": " the"}
+
+data: {"type": "token", "content": " provided"}
+
+data: {"type": "token", "content": " document"}
+
+data: {"type": "token", "content": "."}
+
+data: {"type": "done", "model": "openai/gpt-4o-mini", "fallback_used": true, "cache_hit": false, "sources": ["chunk_0078", "chunk_0022", "chunk_0081"], "usage": {"prompt_tokens": 339, "completion_tokens": 10, "total_tokens": 349}, "cost_usd": 5.685e-05, "latency_ms": 1006, "ttft_ms": 939, "output_filtered": false, "rate_limit_exceeded": false, "retry_after": 0}
+
+
+=== Request #4 (Break down all twelve factors step by step with concrete examples) ===
+HTTP/1.1 200 OK
+date: Tue, 12 May 2026 08:45:27 GMT
+server: Fly/a589ac11 (2026-05-08)
+content-type: text/event-stream; charset=utf-8
+transfer-encoding: chunked
+via: 1.1 fly.io
+fly-request-id: 01KRDNSMAS06JSG0WS9627GJZS-fra
+
+data: {"type": "token", "content": "I"}
+
+data: {"type": "token", "content": " don't"}
+
+data: {"type": "token", "content": " know"}
+
+data: {"type": "token", "content": " based"}
+
+data: {"type": "token", "content": " on"}
+
+data: {"type": "token", "content": " the"}
+
+data: {"type": "token", "content": " provided"}
+
+data: {"type": "token", "content": " document"}
+
+data: {"type": "token", "content": "."}
+
+data: {"type": "done", "model": "openai/gpt-4o-mini", "fallback_used": true, "cache_hit": false, "sources": ["chunk_0022", "chunk_0078", "chunk_0059"], "usage": {"prompt_tokens": 296, "completion_tokens": 9, "total_tokens": 305}, "cost_usd": 4.98e-05, "latency_ms": 1130, "ttft_ms": 713, "output_filtered": false, "rate_limit_exceeded": false, "retry_after": 0}
+
+
+=== Request #5 (Give an exhaustive overview of every twelve-factor methodology principle) ===
+HTTP/1.1 200 OK
+date: Tue, 12 May 2026 08:45:29 GMT
+server: Fly/a589ac11 (2026-05-08)
+content-type: text/event-stream; charset=utf-8
+transfer-encoding: chunked
+via: 1.1 fly.io
+fly-request-id: 01KRDNSP5YGH8AP2NRHD07QJQM-fra
+
+data: {"type": "token", "content": "I"}
+
+data: {"type": "token", "content": " don't"}
+
+data: {"type": "token", "content": " know"}
+
+data: {"type": "token", "content": " based"}
+
+data: {"type": "token", "content": " on"}
+
+data: {"type": "token", "content": " the"}
+
+data: {"type": "token", "content": " provided"}
+
+data: {"type": "token", "content": " document"}
+
+data: {"type": "token", "content": "."}
+
+data: {"type": "done", "model": "openai/gpt-4o-mini", "fallback_used": true, "cache_hit": false, "sources": ["chunk_0059", "chunk_0078", "chunk_0022"], "usage": {"prompt_tokens": 295, "completion_tokens": 10, "total_tokens": 305}, "cost_usd": 5.025e-05, "latency_ms": 1044, "ttft_ms": 1021, "output_filtered": false, "rate_limit_exceeded": false, "retry_after": 0}
+
+
+=== Request #6 (Provide a comprehensive analysis of all twelve factors with examples) ===
+HTTP/1.1 200 OK
+date: Tue, 12 May 2026 08:45:31 GMT
+server: Fly/a589ac11 (2026-05-08)
+content-type: text/event-stream; charset=utf-8
+transfer-encoding: chunked
+via: 1.1 fly.io
+fly-request-id: 01KRDNSQY8714S7DN0NBMP8YFP-fra
+
+data: {"type": "token", "content": "I"}
+
+data: {"type": "token", "content": " don't"}
+
+data: {"type": "token", "content": " know"}
+
+data: {"type": "token", "content": " based"}
+
+data: {"type": "token", "content": " on"}
+
+data: {"type": "token", "content": " the"}
+
+data: {"type": "token", "content": " provided"}
+
+data: {"type": "token", "content": " document"}
+
+data: {"type": "token", "content": "."}
+
+data: {"type": "done", "model": "openai/gpt-4o-mini", "fallback_used": true, "cache_hit": false, "sources": ["chunk_0078", "chunk_0051", "chunk_0081"], "usage": {"prompt_tokens": 344, "completion_tokens": 10, "total_tokens": 354}, "cost_usd": 5.76e-05, "latency_ms": 912, "ttft_ms": 880, "output_filtered": false, "rate_limit_exceeded": false, "retry_after": 0}
+
+
+=== Request #7 (Detail each of the twelve factors and explain when to apply them) ===
+HTTP/1.1 200 OK
+date: Tue, 12 May 2026 08:45:33 GMT
+server: Fly/a589ac11 (2026-05-08)
+content-type: text/event-stream; charset=utf-8
+transfer-encoding: chunked
+via: 1.1 fly.io
+fly-request-id: 01KRDNSSJGG2Z9BYGWJ4VEM7M5-fra
+
+data: {"type": "token", "content": "I"}
+
+data: {"type": "token", "content": " don't"}
+
+data: {"type": "token", "content": " know"}
+
+data: {"type": "token", "content": " based"}
+
+data: {"type": "token", "content": " on"}
+
+data: {"type": "token", "content": " the"}
+
+data: {"type": "token", "content": " provided"}
+
+data: {"type": "token", "content": " document"}
+
+data: {"type": "token", "content": "."}
+
+data: {"type": "done", "model": "openai/gpt-4o-mini", "fallback_used": true, "cache_hit": false, "sources": ["chunk_0078", "chunk_0022", "chunk_0059"], "usage": {"prompt_tokens": 297, "completion_tokens": 10, "total_tokens": 307}, "cost_usd": 5.055e-05, "latency_ms": 730, "ttft_ms": 700, "output_filtered": false, "rate_limit_exceeded": false, "retry_after": 0}
+
+
+=== Request #8 (Compare and contrast all twelve factors highlighting their purposes) ===
+HTTP/1.1 200 OK
+date: Tue, 12 May 2026 08:45:34 GMT
+server: Fly/a589ac11 (2026-05-08)
+content-type: text/event-stream; charset=utf-8
+transfer-encoding: chunked
+via: 1.1 fly.io
+fly-request-id: 01KRDNSV10ZHX9FSF7V3H68QWC-fra
+
+data: {"type": "token", "content": "I"}
+
+data: {"type": "token", "content": " don't"}
+
+data: {"type": "token", "content": " know"}
+
+data: {"type": "token", "content": " based"}
+
+data: {"type": "token", "content": " on"}
+
+data: {"type": "token", "content": " the"}
+
+data: {"type": "token", "content": " provided"}
+
+data: {"type": "token", "content": " document"}
+
+data: {"type": "token", "content": "."}
+
+data: {"type": "done", "model": "openai/gpt-4o-mini", "fallback_used": true, "cache_hit": false, "sources": ["chunk_0078", "chunk_0059", "chunk_0022"], "usage": {"prompt_tokens": 294, "completion_tokens": 9, "total_tokens": 303}, "cost_usd": 4.95e-05, "latency_ms": 848, "ttft_ms": 671, "output_filtered": false, "rate_limit_exceeded": false, "retry_after": 0}
+
+
+=== Request #9 (Discuss each twelve-factor principle with implementation considerations) ===
+HTTP/1.1 200 OK
+date: Tue, 12 May 2026 08:45:36 GMT
+server: Fly/a589ac11 (2026-05-08)
+content-type: text/event-stream; charset=utf-8
+transfer-encoding: chunked
+via: 1.1 fly.io
+fly-request-id: 01KRDNSWKGVNX2EYKVW41AYEKY-fra
+
+data: {"type": "token", "content": "I"}
+
+data: {"type": "token", "content": " don't"}
+
+data: {"type": "token", "content": " know"}
+
+data: {"type": "token", "content": " based"}
+
+data: {"type": "token", "content": " on"}
+
+data: {"type": "token", "content": " the"}
+
+data: {"type": "token", "content": " provided"}
+
+data: {"type": "token", "content": " document"}
+
+data: {"type": "token", "content": "."}
+
+data: {"type": "done", "model": "openai/gpt-4o-mini", "fallback_used": true, "cache_hit": false, "sources": ["chunk_0053", "chunk_0022", "chunk_0059"], "usage": {"prompt_tokens": 276, "completion_tokens": 10, "total_tokens": 286}, "cost_usd": 4.74e-05, "latency_ms": 665, "ttft_ms": 637, "output_filtered": false, "rate_limit_exceeded": false, "retry_after": 0}
+
+
+=== Request #10 (Explain the rationale behind each of the twelve factors in detail) ===
+HTTP/1.1 200 OK
+date: Tue, 12 May 2026 08:45:37 GMT
+server: Fly/a589ac11 (2026-05-08)
+content-type: text/event-stream; charset=utf-8
+transfer-encoding: chunked
+via: 1.1 fly.io
+fly-request-id: 01KRDNSXZZARVCK38SG1NZ6BT2-fra
+
+data: {"type": "token", "content": "I"}
+
+data: {"type": "token", "content": " don't"}
+
+data: {"type": "token", "content": " know"}
+
+data: {"type": "token", "content": " based"}
+
+data: {"type": "token", "content": " on"}
+
+data: {"type": "token", "content": " the"}
+
+data: {"type": "token", "content": " provided"}
+
+data: {"type": "token", "content": " document"}
+
+data: {"type": "token", "content": "."}
+
+data: {"type": "done", "model": "openai/gpt-4o-mini", "fallback_used": true, "cache_hit": false, "sources": ["chunk_0078", "chunk_0022", "chunk_0059"], "usage": {"prompt_tokens": 296, "completion_tokens": 9, "total_tokens": 305}, "cost_usd": 4.98e-05, "latency_ms": 799, "ttft_ms": 657, "output_filtered": false, "rate_limit_exceeded": false, "retry_after": 0}
+
+
+=== Request #11 (List every twelve-factor principle and describe its operational impact) ===
+HTTP/1.1 200 OK
+date: Tue, 12 May 2026 08:45:39 GMT
+server: Fly/a589ac11 (2026-05-08)
+content-type: text/event-stream; charset=utf-8
+transfer-encoding: chunked
+via: 1.1 fly.io
+fly-request-id: 01KRDNSZHVFSG5Z7ZG32DN0T25-fra
+
+data: {"type": "token", "content": "I"}
+
+data: {"type": "token", "content": " don't"}
+
+data: {"type": "token", "content": " know"}
+
+data: {"type": "token", "content": " based"}
+
+data: {"type": "token", "content": " on"}
+
+data: {"type": "token", "content": " the"}
+
+data: {"type": "token", "content": " provided"}
+
+data: {"type": "token", "content": " document"}
+
+data: {"type": "token", "content": "."}
+
+data: {"type": "done", "model": "openai/gpt-4o-mini", "fallback_used": true, "cache_hit": false, "sources": ["chunk_0059", "chunk_0022", "chunk_0078"], "usage": {"prompt_tokens": 295, "completion_tokens": 10, "total_tokens": 305}, "cost_usd": 5.025e-05, "latency_ms": 1103, "ttft_ms": 1081, "output_filtered": false, "rate_limit_exceeded": false, "retry_after": 0}
+
+
+=== Request #12 (Articulate each twelve-factor concept with deployment scenarios) ===
+HTTP/1.1 200 OK
+date: Tue, 12 May 2026 08:45:41 GMT
+server: Fly/a589ac11 (2026-05-08)
+content-type: text/event-stream; charset=utf-8
+transfer-encoding: chunked
+via: 1.1 fly.io
+fly-request-id: 01KRDNT1CG245C3E6VY3J60E76-fra
+
+data: {"type": "token", "content": "I"}
+
+data: {"type": "token", "content": " don't"}
+
+data: {"type": "token", "content": " know"}
+
+data: {"type": "token", "content": " based"}
+
+data: {"type": "token", "content": " on"}
+
+data: {"type": "token", "content": " the"}
+
+data: {"type": "token", "content": " provided"}
+
+data: {"type": "token", "content": " document"}
+
+data: {"type": "token", "content": "."}
+
+data: {"type": "done", "model": "openai/gpt-4o-mini", "fallback_used": false, "cache_hit": false, "sources": ["chunk_0059", "chunk_0046", "chunk_0005"], "usage": {"prompt_tokens": 348, "completion_tokens": 9, "total_tokens": 357}, "cost_usd": 5.76e-05, "latency_ms": 1057, "ttft_ms": 970, "output_filtered": false, "rate_limit_exceeded": false, "retry_after": 0}
+
+
+================================================================================
+NATURAL BURST RESULT: 12 diverse heavy queries with X-API-Key: demo-free
+  --> All 12 returned HTTP/1.1 200 OK; bucket reached 2217 / 5000 tokens.
+  Reason: each request consumes ~310 tokens server-side under the
+  current OpenRouter stream usage reporting. To hit 5000 in the 60s
+  TTL window with a single client, ~17 sequential requests are needed.
+
+DETERMINISTIC RATE-LIMIT PROOF (Redis pre-seed):
+  - Set bucket:demo-free:tokens_used = 9999 (above the 5000/min limit)
+  - Issue one /chat/stream request → server pre-flight check_and_consume(0)
+    reads bucket, sees > limit, raises HTTPException(429, Retry-After).
+================================================================================
+
+Bucket seeded: bucket:demo-free:tokens_used = 9999 (TTL 60s)
+
+=== Post-seed request (expect HTTP/1.1 429 + Retry-After) ===
+HTTP/1.1 429 Too Many Requests
+date: Tue, 12 May 2026 08:47:35 GMT
+server: Fly/a589ac11 (2026-05-08)
+retry-after: 60
+content-length: 32
+content-type: application/json
+via: 1.1 fly.io
+fly-request-id: 01KRDNXHG11VFBHJPYEBT2PYSQ-fra
+
+{"detail":"rate limit exceeded"}
