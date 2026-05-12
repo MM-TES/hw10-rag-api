@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HW10 — Production-Ready RAG API · Phase 2 R&D Report</title>
+<style>
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1f2937;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 32px 28px 64px;
+    line-height: 1.55;
+    background: #fafafa;
+  }
+  h1 { font-size: 30px; margin-bottom: 4px; }
+  h2 { font-size: 22px; border-bottom: 1px solid #d1d5db; padding-bottom: 4px; margin-top: 40px; }
+  h3 { font-size: 17px; margin-top: 26px; color: #374151; }
+  h4 { font-size: 14px; margin: 14px 0 4px; color: #6b7280; text-transform: uppercase; letter-spacing: .04em; }
+  .meta { color: #6b7280; font-size: 13px; }
+  .abstract { background: #fff; border-left: 3px solid #2563eb; padding: 14px 18px; margin: 18px 0; }
+  pre, code { font-family: "Consolas", "Menlo", monospace; background: #f3f4f6; padding: 2px 5px; border-radius: 3px; }
+  pre { padding: 12px; overflow-x: auto; font-size: 12px; line-height: 1.4; }
+  table.results-table {
+    border-collapse: collapse;
+    width: 100%;
+    background: #fff;
+    font-size: 13px;
+    margin: 12px 0;
+  }
+  table.results-table th, table.results-table td {
+    border: 1px solid #e5e7eb;
+    padding: 6px 9px;
+    text-align: left;
+  }
+  table.results-table th { background: #f3f4f6; }
+  table.results-table tr:nth-child(even) td { background: #fafafa; }
+  figure { margin: 14px 0; }
+  figure img { max-width: 100%; border: 1px solid #e5e7eb; background: #fff; padding: 4px; }
+  figcaption { font-size: 12px; color: #6b7280; margin-top: 4px; }
+  .interpretation { background: #fffbeb; border-left: 3px solid #d97706; padding: 12px 18px; margin: 14px 0; }
+  .interpretation p { margin: 8px 0; }
+  .arch { font-family: "Consolas", "Menlo", monospace; background: #0f172a; color: #e2e8f0; padding: 16px; overflow-x: auto; font-size: 12px; line-height: 1.35; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #d1d5db; color: #6b7280; font-size: 12px; }
+  .badge { display: inline-block; background: #e0e7ff; color: #3730a3; padding: 1px 6px; border-radius: 4px; font-size: 11px; margin-right: 6px; }
+  ul.tight { margin: 6px 0; padding-left: 22px; }
+  ul.tight li { margin: 2px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>HW10 — Production-Ready RAG API</h1>
+  <div class="meta">Phase 2 · R&amp;D Report · {{ generated_at }} · author: {{ author }}</div>
+  <div style="margin-top:6px">
+    <span class="badge">8 experiments</span>
+    <span class="badge">eval n=20</span>
+    <span class="badge">judge: Haiku 4.5</span>
+    <span class="badge">interp: Opus 4.7</span>
+    <span class="badge">prod: hw10-rag-api.fly.dev</span>
+  </div>
+</header>
+
+<section>
+  <h2>Executive Summary</h2>
+  <div class="abstract">{{ executive | safe }}</div>
+</section>
+
+<section>
+  <h2>Architecture Overview</h2>
+  <p>Architecture (request flow) replicated from <code>CLAUDE.md</code>:</p>
+  <pre class="arch">{{ arch_diagram }}</pre>
+  <p>Backends: <strong>Qdrant Cloud</strong> (chunks + cache), <strong>Upstash Redis</strong> (token-bucket rate limiting, REST API only), <strong>Supabase Postgres</strong> (request_logs / cost), <strong>Langfuse</strong> (traces), <strong>OpenRouter</strong> (LLM gateway with fallback chain + circuit breaker).</p>
+</section>
+
+<section>
+  <h2>Methodology</h2>
+  <h4>Eval set</h4>
+  <p>20 questions across 4 categories (5 each): <em>factual</em>, <em>comparative</em>, <em>out_of_scope</em>, <em>paraphrase</em>. Stored in <code>experiments/eval_questions.json</code>. Categories used per experiment: factual+comparative (n=10) for quality-sensitive sweeps (EXP-01/02/04); paraphrase+factual for cache-threshold pairs (EXP-03); all 20 for load mix.</p>
+
+  <h4>Metrics</h4>
+  <ul class="tight">
+    <li><strong>Judge scores</strong> (1-5) on faithfulness, relevance, completeness — via Claude Haiku 4.5 LLM-as-judge.</li>
+    <li><strong>TTFT</strong> (time-to-first-token) and total latency p50 / p95 for model comparison.</li>
+    <li><strong>Cost</strong> per request from <code>app.llm.pricing.calc_cost(model, input_tokens, output_tokens)</code>.</li>
+    <li><strong>TPR / FPR</strong> for cache threshold trade-off — local cosine similarity over MiniLM-L6-v2 embeddings.</li>
+  </ul>
+
+  <h4>Infrastructure</h4>
+  <ul class="tight">
+    <li>Service: FastAPI + Uvicorn on Fly.io shared-cpu-1x@1024MB, region {{ region }}.</li>
+    <li>Vector DB: Qdrant Cloud (384-dim, cosine), Redis: Upstash REST, Postgres: Supabase pooler + asyncpg.</li>
+    <li>LLM gateway: OpenRouter (8 model SKUs configured), embedder: <code>sentence-transformers/all-MiniLM-L6-v2</code>.</li>
+  </ul>
+
+  <h4>Budget</h4>
+  <p>Hard cap $5.00 per <code>experiments/budget_guard.py</code>, baseline snapshot taken at run start. Total Phase-2 prod-tracked spend: <strong>${{ total_spent }}</strong>. Direct OpenRouter calls (EXP-01/02/04) are not logged in <code>request_logs</code>; their cost is reported in each experiment's CSV.</p>
+</section>
+
+{% for section in exp_sections %}
+<section>
+  <h2>{{ section.id|upper }} — {{ section.title }}</h2>
+  <h4>Hypothesis</h4>
+  <p>{{ section.hypothesis }}</p>
+  <h4>Setup</h4>
+  <p>{{ section.setup }}</p>
+
+  {% if section.table %}
+    <h4>Results</h4>
+    {{ section.table | safe }}
+  {% endif %}
+
+  {% for fig in section.figures %}
+    <figure>
+      <img src="{{ fig.rel }}" alt="{{ fig.caption }}">
+      <figcaption>{{ fig.caption }}</figcaption>
+    </figure>
+  {% endfor %}
+
+  <h4>Opus Interpretation</h4>
+  <div class="interpretation">
+    {% for para in section.interpretation_paragraphs %}
+      <p>{{ para }}</p>
+    {% endfor %}
+  </div>
+</section>
+{% endfor %}
+
+<section>
+  <h2>Cross-experiment Insights</h2>
+  <div class="interpretation">{{ cross_insights | safe }}</div>
+</section>
+
+<section>
+  <h2>Engineering Decisions Log</h2>
+  <p>Captured from git history (<code>git log --oneline</code>, Phase 1+2 scope):</p>
+  <pre>{{ git_log }}</pre>
+</section>
+
+<section>
+  <h2>Appendix A — Full eval dataset</h2>
+  <pre>{{ eval_json }}</pre>
+</section>
+
+<section>
+  <h2>Appendix B — Model pricing table (OpenRouter, USD per 1M tokens)</h2>
+  {{ pricing_table | safe }}
+</section>
+
+<div class="footer">
+  Generated by <code>report/generate.py</code> · Phase 2 R&amp;D layer on top of HW10 Production-Ready RAG API · {{ generated_at }} · model: Opus 4.7 (interpretations), Haiku 4.5 (judge)
+</div>
+
+</body>
+</html>
