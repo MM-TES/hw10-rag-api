@@ -82,7 +82,7 @@ Backends: **Qdrant Cloud** (chunks_collection + cache_collection, 384-dim cosine
 | `POST /index/rebuild` | X-API-Key (enterprise tier) | re-index у background |
 
 Demo API keys:
-- `demo-free` — 5 000 tokens/min, models: gemini-flash → gpt-4o-mini → llama:free
+- `demo-free` — **500 tokens/min** (demo limit; production tier would be 5 000+), models: gemini-flash → gpt-4o-mini → llama:free
 - `demo-pro` — 20 000 tokens/min, models: gpt-4o-mini → claude-3.5-haiku → gemini-flash
 - `demo-enterprise` — 100 000 tokens/min, models: gpt-4o → claude-3.5-sonnet → gemini-pro
 

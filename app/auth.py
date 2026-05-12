@@ -6,7 +6,7 @@ from fastapi import Header, HTTPException, status
 API_KEYS: dict[str, dict] = {
     "demo-free": {
         "tier": "free",
-        "tokens_per_min": 5000,
+        "tokens_per_min": 500,
         "models": [
             "google/gemini-flash-1.5",
             "openai/gpt-4o-mini",
