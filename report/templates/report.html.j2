@@ -38,8 +38,18 @@
   figure { margin: 14px 0; }
   figure img { max-width: 100%; border: 1px solid #e5e7eb; background: #fff; padding: 4px; }
   figcaption { font-size: 12px; color: #6b7280; margin-top: 4px; }
-  .interpretation { background: #fffbeb; border-left: 3px solid #d97706; padding: 12px 18px; margin: 14px 0; }
+  .interpretation { background: #fffbeb; border-left: 3px solid #d97706; padding: 14px 22px; margin: 14px 0; }
   .interpretation p { margin: 8px 0; }
+  .interpretation h1, .interpretation h2 { font-size: 17px; border: none; margin: 14px 0 6px; padding: 0; color: #92400e; }
+  .interpretation h3 { font-size: 15px; margin: 12px 0 4px; color: #92400e; }
+  .interpretation h4 { font-size: 13px; margin: 10px 0 4px; color: #92400e; text-transform: none; letter-spacing: 0; }
+  .interpretation ul, .interpretation ol { margin: 6px 0 8px 22px; padding: 0; }
+  .interpretation li { margin: 3px 0; }
+  .interpretation strong { color: #78350f; }
+  .interpretation code { background: #fde68a; color: #78350f; }
+  .abstract h1, .abstract h2, .abstract h3 { font-size: 16px; margin: 10px 0 4px; color: #1e40af; border: none; padding: 0; }
+  .abstract ul { margin: 6px 0 8px 22px; }
+  .abstract p { margin: 6px 0; }
   .arch { font-family: "Consolas", "Menlo", monospace; background: #0f172a; color: #e2e8f0; padding: 16px; overflow-x: auto; font-size: 12px; line-height: 1.35; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #d1d5db; color: #6b7280; font-size: 12px; }
@@ -120,9 +130,7 @@
 
   <h4>Opus Interpretation</h4>
   <div class="interpretation">
-    {% for para in section.interpretation_paragraphs %}
-      <p>{{ para }}</p>
-    {% endfor %}
+    {{ section.interpretation_html | safe }}
   </div>
 </section>
 {% endfor %}

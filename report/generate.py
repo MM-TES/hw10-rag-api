@@ -14,6 +14,7 @@ import subprocess
 import time
 from pathlib import Path
 
+import markdown as md_lib
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
@@ -25,8 +26,33 @@ from report import interpret, plots
 RESULTS_DIR = Path("experiments/results")
 OUTPUT_DIR = Path("report/output")
 FIGURES_DIR = OUTPUT_DIR / "figures"
+INTERPRETATIONS_CACHE = OUTPUT_DIR / "_interpretations.json"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def _md_to_html(text: str) -> str:
+    """Render Opus markdown output to HTML (headers, lists, bold, code)."""
+    if not text:
+        return ""
+    return md_lib.markdown(
+        text,
+        extensions=["extra", "sane_lists", "nl2br"],
+        output_format="html5",
+    )
+
+
+def _load_interp_cache() -> dict[str, str]:
+    if INTERPRETATIONS_CACHE.exists():
+        try:
+            return json.loads(INTERPRETATIONS_CACHE.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
+
+
+def _save_interp_cache(cache: dict[str, str]) -> None:
+    INTERPRETATIONS_CACHE.write_text(json.dumps(cache, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 ARCH_DIAGRAM = """\
@@ -226,9 +252,16 @@ async def main() -> None:
         for exp_id, df in results.items()
     }
 
-    # 3. Opus interpretations
+    # 3. Opus interpretations (cached in report/output/_interpretations.json)
+    cache = _load_interp_cache()
+    cache_hits = [k for k in list(cache.keys()) if cache[k]]
+    if cache_hits:
+        write_log(f"[report] interpretation cache hits: {sorted(cache_hits)}")
     interpretations: dict[str, str] = {}
     for exp_id, meta in EXP_META.items():
+        if cache.get(exp_id):
+            interpretations[exp_id] = cache[exp_id]
+            continue
         df = results.get(exp_id, pd.DataFrame())
         csv_data = df.to_csv(index=False) if not df.empty else "(no data)"
         write_log(f"[report] Opus interpret {exp_id} ...")
@@ -239,21 +272,30 @@ async def main() -> None:
             csv_data=csv_data,
             key_metrics=meta["key_metrics"],
         )
+        cache[exp_id] = interpretations[exp_id]
+        _save_interp_cache(cache)
 
     summary_blob = _summary_for_opus(results)
-    write_log("[report] Opus executive summary ...")
-    executive = await interpret.executive_summary(summary_blob)
-    write_log("[report] Opus cross insights ...")
-    cross = await interpret.cross_insights(summary_blob)
+    if cache.get("executive"):
+        executive = cache["executive"]
+    else:
+        write_log("[report] Opus executive summary ...")
+        executive = await interpret.executive_summary(summary_blob)
+        cache["executive"] = executive
+        _save_interp_cache(cache)
+    if cache.get("cross"):
+        cross = cache["cross"]
+    else:
+        write_log("[report] Opus cross insights ...")
+        cross = await interpret.cross_insights(summary_blob)
+        cache["cross"] = cross
+        _save_interp_cache(cache)
 
-    # 4. Build template context
+    # 4. Build template context — convert Opus markdown to HTML
     exp_sections = []
     for exp_id, meta in EXP_META.items():
         interp_text = interpretations.get(exp_id, "")
-        # split into paragraphs by blank lines for readable HTML
-        paragraphs = [p.strip() for p in interp_text.split("\n\n") if p.strip()]
-        if not paragraphs:
-            paragraphs = [interp_text or "(no interpretation)"]
+        interp_html = _md_to_html(interp_text) or "<p>(no interpretation)</p>"
         exp_sections.append(
             {
                 "id": exp_id,
@@ -262,12 +304,12 @@ async def main() -> None:
                 "setup": meta["setup"],
                 "table": tables.get(exp_id, ""),
                 "figures": rendered_figs.get(exp_id, []),
-                "interpretation_paragraphs": paragraphs,
+                "interpretation_html": interp_html,
             }
         )
 
-    # Format cross insights: keep markdown-ish bullets visible as plain HTML
-    cross_html = cross.replace("\n", "<br>")
+    cross_html = _md_to_html(cross)
+    executive_html = _md_to_html(executive)
 
     env = Environment(
         loader=FileSystemLoader("report/templates"),
@@ -279,7 +321,7 @@ async def main() -> None:
     html = template.render(
         generated_at=time.strftime("%Y-%m-%d %H:%M:%S"),
         author="MTeslenko (Opus 4.7 assist)",
-        executive=executive.replace("\n", "<br>"),
+        executive=executive_html,
         arch_diagram=ARCH_DIAGRAM,
         region="ord (Fly.io)",
         total_spent=f"{total_spent:.4f}",
