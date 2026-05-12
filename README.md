@@ -152,6 +152,60 @@ curl https://hw10-rag-api.fly.dev/usage/breakdown -H "X-API-Key: demo-pro"
 
 ---
 
-## Phase 2
+## Phase 2 — R&D Report
 
-Phase 2 (експерименти + PDF звіт під $10 budget) — у `../_tasks/CLAUDE_CODE_PHASE2.md`. Артефакти Phase 1 (`app/`, `scripts/`) immutable з моменту `Phase 1 complete` commit'у.
+Phase 2 — 8 експериментів про trade-offs RAG-системи + автогенерований HTML-звіт з інтерпретаціями Claude Opus 4.7. Артефакти Phase 1 (`app/`, `scripts/`) immutable з моменту `Phase 1 complete` commit'у.
+
+Спека: `../_tasks/PHASE2.md`. Запуск: `.\.venv\Scripts\python.exe -m experiments.run_all` потім `.\.venv\Scripts\python.exe -m report.generate`.
+
+### Звіт
+
+`report/output/HW10_Report.html` (~87 KB, локальний артефакт — у `.gitignore`).
+
+Відкрити: `start report\output\HW10_Report.html`. 8 експериментів, 9 фігур (matplotlib), таблиці CSV, секція cross-insights, повний eval dataset у Appendix.
+
+### Експерименти (8 шт)
+
+1. **EXP-01 Chunking sweep** — chunk_size ∈ {200, 350, 500, 750, 1000}, тимчасові Qdrant-колекції, gpt-4o-mini.
+2. **EXP-02 Top-K sweep** — top_k ∈ {1, 2, 3, 5, 8} на найкращому chunk_size з EXP-01.
+3. **EXP-03 Cache threshold** — TPR / FPR на paraphrase pairs (local-only, $0).
+4. **EXP-04 Model comparison** — 4 LLM-и (llama-3.1-8b, gpt-4o-mini, claude-3.5-haiku, gpt-4o), direct OpenRouter, Pareto cost vs quality.
+5. **EXP-05 Load test (lite)** — concurrency 2/5/10 проти Fly.io shared-cpu-1x.
+6. **EXP-06 Fallback observed** — SQL агрегація `request_logs`.
+7. **EXP-07 Injection suite** — 30 атак, 6 категорій (direct/role/leak/encoded/multi/indirect).
+8. **EXP-08 Cost projection** — 1k/10k/100k req/day × cache hit-rate {0, 30, 60}%.
+
+### Phase 2 top-level numbers
+
+| Метрика | Знахідка |
+|---|---|
+| Best chunk_size (EXP-01) | **750** (F=5.0 R=5.0 C=4.9; 68 чанків у індексі) |
+| Best top_k (EXP-02) | **3** (плато якості від k=1 до k=5, лінійний ріст input tokens) |
+| Recommended cache threshold (EXP-03) | **0.85** (TPR=13%, FPR=0% — нульові false positives) |
+| Best cost/quality model (EXP-04) | **openai/gpt-4o-mini** (F/R/C 5.0/5.0/4.9, ttft p50 836 ms, $0.0001/req) |
+| Cheapest viable model (EXP-04) | **meta-llama/llama-3.1-8b-instruct** ($0.000024/req, F/R/C 4.9/5.0/4.7) |
+| p95 latency @ 10 concurrent (EXP-05) | 71.9 s (Fly.io shared-cpu-1x під 10× SSE — значна деградація) |
+| Injection success rate (EXP-07) | **1/30 = 3.3%** (8 blocked-at-input, 21 defended-at-output) |
+| Projected cost @ 10k req/day, 30% cache (EXP-08) | **~$1.93/day** на default tier mix free60/pro30/ent10 |
+| Total Phase 2 spend (tracked prod + direct) | < $0.15 (budget guard cap = $5.00) |
+
+### Workflow
+
+```powershell
+# 1. Run all 8 experiments (~25 min)
+.\.venv\Scripts\python.exe -m experiments.run_all
+
+# Або по одному:
+.\.venv\Scripts\python.exe -m experiments.exp01_chunking
+.\.venv\Scripts\python.exe -m experiments.exp04_models
+# ...
+
+# 2. Generate HTML report (~4 min — 10 Opus calls)
+.\.venv\Scripts\python.exe -m report.generate
+
+# 3. Open
+start report\output\HW10_Report.html
+```
+
+Бюджет: `experiments/budget_guard.py` (singleton, hard_stop=$5.00, baseline-snapshot pattern). Перед кожним LLM-викликом — `await guard.check(projected_usd=...)`; на `BudgetExceededError` — graceful skip, partial CSV.
+
